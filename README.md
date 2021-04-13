@@ -1,5 +1,13 @@
 # WindowsEnum
 
+# windows-enumeration.bat
+No PowerShell?  No Problem?
+
+## Usage
+
+Run as administrator if you can, otherwise open where you want the output.txt file.
+
+# windows-enumeration.ps1
 A Powershell Privilege Escalation Enumeration Script.
 
 ## Usage
