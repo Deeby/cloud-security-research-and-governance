@@ -6,10 +6,10 @@ Generates passwords & "random" strings.
 
 # WindowsEnum
 
-#PSRecon
+# PSRecon
 See readme in directory.
 
-#scri%00pt
+# scri%00pt
 see readme in directory.
 
 # windows-enumeration.bat
