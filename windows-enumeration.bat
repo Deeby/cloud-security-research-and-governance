@@ -1,7 +1,6 @@
 :: Script       : windows-enumeration
 :: Description  : Local enumeration on windows, output to "output.txt" at the location the batch file is run.
 :: Notes        : This is very 'loud' and should only be used for ethical purposes.  Contact me with any questions or if you require assistance.
-:: Author:      : ryanmrestivo
 :: Version      : 1.0
 
 @echo off

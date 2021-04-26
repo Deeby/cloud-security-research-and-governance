@@ -24,20 +24,19 @@ ECHO  :                                [4] 40 Random Characters Long            
 ECHO  :                                [5] 50 Random Characters Long                              :
 ECHO  :                                [6] Custom Random Length                                   :
 ECHO  :                                                                                           :
-ECHO  :                                [7] ABOUT                                                  :
-ECHO  :                                [8] EXIT                                                   :
+ECHO  :                                                                                           :
+ECHO  :                                [7] EXIT                                                   :
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 12345678 /M "%SPGprompt%: Make your selection:"
+CHOICE /C 1234567 /M "%SPGprompt%: Make your selection:"
 IF %ERRORLEVEL%==1 SET RNDLength=10
 IF %ERRORLEVEL%==2 SET RNDLength=20
 IF %ERRORLEVEL%==3 SET RNDLength=30
 IF %ERRORLEVEL%==4 SET RNDLength=40
 IF %ERRORLEVEL%==5 SET RNDLength=50
 IF %ERRORLEVEL%==6 GOTO :CUSTOM
-IF %ERRORLEVEL%==7 GOTO :ABOUT
-IF %ERRORLEVEL%==8 GOTO :EXIT
+IF %ERRORLEVEL%==7 GOTO :EXIT
 
 :PGEN
 REM The random character engine was provided by TheOucaste.
@@ -77,35 +76,6 @@ IF %ERRORLEVEL%==2 GOTO :REGEN
 CHOICE /M "%SPGprompt%: Would you like to generate a new password"
 IF %ERRORLEVEL%==1 ECHO OFF | CLIP && CLS && GOTO :MAIN
 IF %ERRORLEVEL%==2 GOTO :EXIT
-
-:ABOUT
-COLOR E
-CLS
-CALL:HEADER
-ECHO  :                                                                                           :
-ECHO  :            The original random char generator (:PGEN) was provided by TheOutcaste.        :
-ECHO  :            The Simple Password Generator is a batch script that builds upon that          :
-ECHO  :            to generate user selectable lengths passwords and save them to file.           :
-ECHO  :                                                                                           :
-ECHO  :            Copyright (C) 2017 the-j0k3r ^<th3-j0ker at protonmail dot com^>                 :
-ECHO  :            Copyright :PGEN (C) 2009 ^<http://tinyurl.com/TheOutcaste^>                      :
-ECHO  :                                                                                           :
-ECHO  :            This program is FREE software. You can redistribute it and/or                  :
-ECHO  :            modify it under the terms of the GNU General Public License                    :
-ECHO  :            as published by the Free Software Foundation; either version 2                 :
-ECHO  :            of the License, or (at your option) any later version.                         :
-ECHO  :                                                                                           :
-ECHO  :            This program is distributed in the HOPE that it will be USEFUL,                :
-ECHO  :            but WITHOUT ANY WARRANTY; without even the implied warranty of                 :
-ECHO  :            MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                           :
-ECHO  :            See the GNU General Public License for more details.                           :
-ECHO  :                                                                                           :
-ECHO  :            You should have received a copy of the GNU General Public License              :
-ECHO  :            along with this program. If not, write to the Free Software Foundation,        :
-ECHO  :            Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.             :
-ECHO  :                                                                                           :
-ECHO  +-------------------------------------------------------------------------------------------+
-ECHO.
 
 :QUERY
 CHOICE /M "%SPGprompt%: Return to Main Menu"

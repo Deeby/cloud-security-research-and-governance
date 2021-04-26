@@ -1,4 +1,16 @@
+# wifi.bat
+Displays cleartext wifi information.  Doesn't do anything with it.
+
+# password.bat
+Generates passwords & "random" strings.
+
 # WindowsEnum
+
+#PSRecon
+See readme in directory.
+
+#scri%00pt
+see readme in directory.
 
 # windows-enumeration.bat
 No PowerShell?  No Problem?
