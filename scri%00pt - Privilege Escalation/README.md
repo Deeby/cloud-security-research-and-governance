@@ -1,4 +1,4 @@
-# scri%00pt
+# scri%00pt - Privilege Escalation
 
 scri%00pt is PowerShell script designed to help penetration testers quickly identify potential privilege escalation vectors on Windows systems. It is written using PowerShell 2.0 so 'should' run on every Windows version since Windows 7.  Will absolutely tigger ATP in current state.
 

@@ -9,7 +9,7 @@ SET SPGprompt=SPG ^$
 SET Ver=v2.01
 
 :MAIN
-COLOR 1F
+COLOR
 CALL:HEADER
 ECHO.
 ECHO.                          Press CTRL+C to Abort and Terminate Batch Job
