@@ -4,6 +4,7 @@ var helpers = require('../../../helpers/google');
 module.exports = {
     title: 'Storage Bucket All Users Policy',
     category: 'Storage',
+    domain: 'Storage',
     description: 'Ensures Storage bucket policies do not allow global write, delete, or read permissions',
     more_info: 'Storage buckets can be configured to allow the global principal to access the bucket via the bucket policy. This policy should be restricted only to known users or accounts.',
     link: 'https://cloud.google.com/storage/docs/access-control/iam',
@@ -50,27 +51,29 @@ module.exports = {
                 if (bucketPolicy.bindings &&
                     bucketPolicy.bindings.length) {
                     bucketPolicy.bindings.forEach(binding => {
-                       if (binding.members &&
+                        if (binding.members &&
                            binding.members.length) {
-                           binding.members.forEach(member => {
-                               if (member === "allUsers" ||
-                                   member === "allAuthenticatedUsers") {
+                            binding.members.forEach(member => {
+                                if (member === 'allUsers' ||
+                                   member === 'allAuthenticatedUsers') {
                                     var resourceIdArr = bucketPolicy.resourceId.split('/');
                                     var bucketName = resourceIdArr[resourceIdArr.length - 1];
                                     if (badBuckets.indexOf(bucketName) === -1) {
                                         badBuckets.push(bucketName);
                                     }
-                               }
-                           })
-                       }
-                    })
+                                }
+                            });
+                        }
+                    });
                 }
             });
 
             if (badBuckets.length) {
-                var badBucketsStr = badBuckets.join(', ');
-                helpers.addResult(results, 2,
-                    `The following buckets have anonymous or public access: ${badBucketsStr}`, region);
+                badBuckets.forEach(bucket => {
+                    let resource = helpers.createResourceName('b', bucket);
+                    helpers.addResult(results, 2,
+                        'Bucket has anonymous or public access', region, resource);
+                });
             } else {
                 helpers.addResult(results, 0, 'No buckets have anonymous or public access.', region);
             }
@@ -81,4 +84,4 @@ module.exports = {
             callback(null, results, source);
         });
     }
-}
+};

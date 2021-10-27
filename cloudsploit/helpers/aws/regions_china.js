@@ -9,6 +9,7 @@ module.exports = {
     default: ['cn-north-1'],
     all: regions,
     optin: [],
+    accessanalyzer: [],
     acm: [],
     apigateway: regions,
     athena: [],
@@ -39,6 +40,7 @@ module.exports = {
     elbv2: regions,
     emr: regions,
     es: regions,
+    eventbridge: regions,
     kinesis: [],
     firehose: regions,
     glue: regions,
@@ -75,5 +77,6 @@ module.exports = {
     xray: regions,
     resourcegroupstaggingapi: regions,
     codestar: regions,
-    codebuild: regions
+    codebuild: regions,
+    mq: regions
 };

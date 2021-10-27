@@ -25,6 +25,25 @@ var calls = {
             api: 'compute',
             version: 'v1',
             location: 'zone'
+        },
+        aggregatedList: {
+            api: 'compute',
+            version: 'v1',
+            location: null
+        }
+    },
+    images: {
+        list: {
+            api: 'compute',
+            version: 'v1',
+            location: null
+        }
+    },
+    snapshots: {
+        list: {
+            api: 'compute',
+            version: 'v1',
+            location: null,
         }
     },
     securityPolicies: {
@@ -32,6 +51,13 @@ var calls = {
             api: 'compute',
             version: 'v1',
             location: 'global'
+        }
+    },
+    resourcePolicies: {
+        list: {
+            api: 'compute',
+            version: 'v1',
+            location: 'region'
         }
     },
     firewalls: {
@@ -61,13 +87,36 @@ var calls = {
                 location: null
             }
         },
+        spanner: {
+            list: {
+                api: 'spanner',
+                version: 'v1',
+                parent: 'projects'
+            }
+        },
         manyApi: true,
+    },
+    instanceTemplates: {
+        list: {
+            api: 'compute',
+            version: 'v1',
+            location: 'global'
+        }
     },
     instanceGroups: {
         aggregatedList: {
             api: 'compute',
             version: 'v1',
             location: null,
+        }
+    },
+    functions: {
+        list : {
+            api: 'cloudfunctions',
+            version: 'v1',
+            parent: true,
+            location: 'region',
+            nested: true
         }
     },
     keyRings: {
@@ -184,6 +233,67 @@ var calls = {
             parent: true
         }
     },
+    datasets: {
+        list: {
+            api: 'bigquery',
+            version: 'v2',
+            location: null,
+            projectId: true,
+            property: 'datasets'
+        }
+    },
+    policies: {
+        list: {
+            api: 'dns',
+            version: 'v1',
+            location: null
+        }
+    },
+    topics: {
+        list: {
+            api: 'pubsub',
+            version: 'v1',
+            parent: 'project'
+        }
+    },
+    subscriptions: {
+        list: {
+            api: 'pubsub',
+            version: 'v1',
+            parent: 'project'
+        }
+    },
+    jobs: {
+        list: { //https://dataflow.googleapis.com/v1b3/projects/{projectId}/jobs:list
+            api: 'dataflow',
+            location: 'region',
+            version: 'v1b3',
+            projectId: true,
+            regional: true
+        }
+    },
+    deployments: { // https://www.googleapis.com/deploymentmanager/v2/projects/project/global/deployments
+        list: {
+            api: 'deploymentmanager',
+            version: 'v2',
+            location: 'global'
+        }
+    },
+    organizations:{ // https://cloudresourcemanager.googleapis.com/v1beta1/organizations
+        list: {
+            api: 'cloudresourcemanager',
+            version: 'v1beta1',
+            location: null,
+            parent: 'organization'
+        },
+    },
+    urlMaps: { // https://compute.googleapis.com/compute/v1/projects/{project}/global/urlMaps
+        list: {
+            api: 'compute',
+            version: 'v1',
+            location: 'global'
+        }
+    }
 };
 
 var postcalls = {
@@ -244,9 +354,65 @@ var postcalls = {
             filterKey: ['instance'],
             filterValue: ['name'],
         }
+    },
+    backupRuns: {
+        list: {
+            api: 'sqladmin',
+            version: 'v1beta4',
+            location: null,
+            reliesOnService: ['instances'],
+            reliesOnSubService: ['sql'],
+            reliesOnCall: ['list'],
+            filterKey: ['instance'],
+            filterValue: ['name'],
+        }
+    },
+    datasets: {
+        get: {
+            api: 'bigquery',
+            version: 'v2',
+            location: null,
+            reliesOnService: ['datasets'],
+            reliesOnCall: ['list'],
+            filterKey: ['datasetId'],
+            filterValue: ['id'],
+            projectId: true
+        }
+    },
+    jobs: {
+        get: { //https://dataflow.googleapis.com/v1b3/projects/{projectId}/jobs/{jobId}
+            api: 'dataflow',
+            version: 'v1b3',
+            reliesOnService: ['jobs'],
+            reliesOnCall: ['list'],
+            filterKey: ['jobId'],
+            filterValue: ['id'],
+            projectId: true,
+            postcall: true,
+            location: 'region',
+            regional: true
+        }
+    },
+    organizations: { //https://cloudresourcemanager.googleapis.com/v1beta1/{resource=organizations/*}:getIamPolicy
+        getIamPolicy: {
+            api: 'cloudresourcemanager',
+            version: 'v1beta1',
+            reliesOnService: ['organizations'],
+            reliesOnCall: ['list'],
+            filterKey: ['name'],
+            filterValue: ['organizationId'],
+            parent: 'resource'
+        },
+        listOrgPolicies: {
+            api: 'cloudresourcemanager',
+            version: 'v1',
+            reliesOnService: ['organizations'],
+            reliesOnCall: ['list'],
+            filterKey: ['name'],
+            filterValue: ['organizationId'],
+            parent: 'resource'
+        }
     }
-
-
 };
 
 var collect = function(GoogleConfig, settings, callback) {

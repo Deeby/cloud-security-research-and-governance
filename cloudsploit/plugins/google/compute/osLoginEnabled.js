@@ -4,6 +4,7 @@ var helpers = require('../../../helpers/google');
 module.exports = {
     title: 'OS Login Enabled',
     category: 'Compute',
+    domain: 'Compute',
     description: 'Ensures OS login is enabled for the project',
     more_info: 'Enabling OS login ensures that SSH keys used to connect to instances are mapped with IAM users.',
     link: 'https://cloud.google.com/compute/docs/instances/managing-instance-access',
@@ -37,30 +38,23 @@ module.exports = {
                 return rcb();
             }
 
-             projects.data.forEach(project => {
-                 var metaData = project.commonInstanceMetadata || null;
+            projects.data.forEach(project => {
+                var metaData = project.commonInstanceMetadata || null;
 
-                 if (!metaData || !metaData.items || !metaData.items.length) {
-                     helpers.addResult(results, 0, 'OS login is enabled by default', region);
-                     return;
-                 }
+                if (!metaData || !metaData.items || !metaData.items.length) {
+                    helpers.addResult(results, 0, 'OS login is enabled by default', region);
+                    return;
+                }
 
-                 let isEnabled = false;
+                let isEnabled = metaData.items.find(item => item.key && item.key.toLowerCase() === 'enable-oslogin' &&
+                    item.value && item.value.toLowerCase() === 'true');
 
-                 metaData.items.forEach(item => {
-                     if (item.key.toLowerCase() === 'enable-oslogin' &&
-                         item.value.toLowerCase() === 'true') {
-                         isEnabled = true;
-                     }
-                 });
-
-                 if (isEnabled === true) {
-                     helpers.addResult(results, 0, 'OS login is enabled', region);
-                 } else {
-                     helpers.addResult(results, 2, 'OS login is disabled', region);
-                 }
-
-             });
+                if (isEnabled) {
+                    helpers.addResult(results, 0, 'OS login is enabled', region);
+                } else {
+                    helpers.addResult(results, 2, 'OS login is disabled', region);
+                }
+            });
 
             rcb();
         }, function(){
@@ -68,4 +62,4 @@ module.exports = {
             callback(null, results, source);
         });
     }
-}
+};

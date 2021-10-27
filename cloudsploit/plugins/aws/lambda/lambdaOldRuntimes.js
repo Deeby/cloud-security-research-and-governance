@@ -4,6 +4,7 @@ var helpers = require('../../../helpers/aws');
 module.exports = {
     title: 'Lambda Old Runtimes',
     category: 'Lambda',
+    domain: 'Serverless',
     description: 'Ensures Lambda functions are not using out-of-date runtime environments.',
     more_info: 'Lambda runtimes should be kept current with recent versions of the underlying codebase. Deprecated runtimes should not be used.',
     link: 'http://docs.aws.amazon.com/lambda/latest/dg/current-supported-versions.html',
@@ -21,7 +22,10 @@ module.exports = {
             { 'id':'nodejs4.3-edge', 'name': 'Node.js 4.3', 'endOfLifeDate': '2018-04-30' },
             { 'id':'nodejs6.10', 'name': 'Node.js 6.10', 'endOfLifeDate': '2019-08-12' },
             { 'id':'nodejs8.10', 'name': 'Node.js 8.10', 'endOfLifeDate': '2020-03-06' },
-            { 'id':'dotnetcore2.0', 'name': '.Net Core 2.0', 'endOfLifeDate': '2018-10-01' }
+            { 'id':'dotnetcore2.0', 'name': '.Net Core 2.0', 'endOfLifeDate': '2018-10-01' },
+            { 'id':'dotnetcore1.0', 'name': '.Net Core 1.0', 'endOfLifeDate': '2019-06-27' },
+            { 'id':'python2.7', 'name': 'Python 2.7', 'endOfLifeDate': '2020-01-01' },
+            { 'id':'python3.5', 'name': 'Python 3.5', 'endOfLifeDate': '2020-09-13' },
         ];
 
         async.each(regions.lambda, function(region, rcb){

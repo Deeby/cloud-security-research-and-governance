@@ -36,6 +36,12 @@ var globalServices = [
 ];
 
 var calls = {
+    AccessAnalyzer: {
+        listAnalyzers: {
+            property: 'analyzers',
+            paginate: 'NextToken'
+        }
+    },
     ACM: {
         listCertificates: {
             property: 'CertificateSummaryList',
@@ -383,6 +389,10 @@ var calls = {
         describeNetworkAcls: {
             property: 'NetworkAcls',
             paginate: 'NextToken',
+        },
+        describeLaunchTemplates: {
+            property: 'LaunchTemplates',
+            paginate: 'NextToken',
         }
 
     },
@@ -465,7 +475,16 @@ var calls = {
     },
     ES: {
         listDomainNames: {
-            property: 'DomainNames'
+            property: 'DomainNames',
+        }
+    },
+    EventBridge: {
+        listEventBuses: {
+            property: 'EventBuses',
+            paginate: 'NextToken',
+            params:{                
+                Limit: 100,
+            }
         }
     },
     Glue: {
@@ -498,7 +517,7 @@ var calls = {
             property: 'Policies',
             paginate: 'Marker',
             params: {
-                OnlyAttached: true
+                OnlyAttached: true // Making this false will effect IAM Support Policy plugin
             }
         },
         listVirtualMFADevices: {
@@ -555,6 +574,12 @@ var calls = {
             paginate: 'NextMarker',
             paginateReqProp: 'Marker'
         }
+    },
+    MQ: {
+        listBrokers:{
+            property:'BrokerSummaries',
+            paginate:'NextToken'
+        },
     },
     MWAA: {
         listEnvironments: {
@@ -760,13 +785,17 @@ var calls = {
         describeIpGroups:{
             property: 'Result',
             paginate: 'NextToken'
+        },
+        describeWorkspacesConnectionStatus: {
+            property: 'WorkspacesConnectionStatus',
+            paginate: 'NextToken'
         }
     },
     XRay: {
         getEncryptionConfig: {
             property: 'EncryptionConfig'
         }
-    }
+    },
 };
 
 var postcalls = [
@@ -847,6 +876,13 @@ var postcalls = [
                 reliesOnCall: 'describeTrails',
                 filterKey: 'TrailName',
                 filterValue: 'TrailARN'
+            }
+        },
+        CloudWatch: {
+            getEsMetricStatistics: {
+                reliesOnService: 'es',
+                reliesOnCall: 'listDomainNames',
+                override: true,
             }
         },
         CodeStar: {
@@ -985,6 +1021,12 @@ var postcalls = [
                 reliesOnCall: 'describeVpcEndpointServices',
                 filterKey: 'ServiceId',
                 filterValue: 'ServiceId'
+            },
+            describeLaunchTemplateVersions: {
+                reliesOnService: 'ec2',
+                reliesOnCall: 'describeLaunchTemplates',
+                filterKey: 'LaunchTemplateId',
+                filterValue: 'LaunchTemplateId'
             }
         },
         ECR: {
@@ -1205,6 +1247,14 @@ var postcalls = [
                 filterValue: 'FunctionArn'
             }
         },
+        MQ: {
+            describeBroker: {
+                reliesOnService: 'mq',
+                reliesOnCall: 'listBrokers',
+                filterKey: 'BrokerId',
+                filterValue: 'BrokerId'
+            }
+        },
         MWAA: {
             getEnvironment: {
                 reliesOnService: 'mwaa',
@@ -1216,8 +1266,7 @@ var postcalls = [
             describeDBParameters: {
                 reliesOnService: 'rds',
                 reliesOnCall: 'describeDBParameterGroups',
-                filterKey: 'DBParameterGroupName',
-                filterValue: 'DBParameterGroupName'
+                override: true
             }
         },
         Route53: {
@@ -1226,6 +1275,14 @@ var postcalls = [
                 reliesOnCall: 'listHostedZones',
                 filterKey: 'HostedZoneId',
                 filterValue: 'Id'
+            },
+        },
+        Route53Domains: {
+            getDomainDetail: {
+                reliesOnService: 'route53domains',
+                reliesOnCall: 'listDomains',
+                filterKey: 'DomainName',
+                filterValue: 'DomainName'
             },
         },
         S3Control: {

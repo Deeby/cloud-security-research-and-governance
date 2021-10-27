@@ -4,6 +4,7 @@ var helpers = require('../../../helpers/google');
 module.exports = {
     title: 'Bucket Versioning',
     category: 'Storage',
+    domain: 'Storage',
     description: 'Ensures object versioning is enabled on storage buckets',
     more_info: 'Object versioning can help protect against the overwriting of objects or data loss in the event of a compromise.',
     link: 'https://cloud.google.com/storage/docs/using-object-versioning',
@@ -33,18 +34,19 @@ module.exports = {
             }
 
             buckets.data.forEach(bucket => {
-                if (bucket.id) {
+                if (bucket.name) {
+                    let resource = helpers.createResourceName('b', bucket.name);
                     if (bucket.versioning &&
                         bucket.versioning.enabled) {
-                        helpers.addResult(results, 0, 'Bucket versioning Enabled', region, bucket.id);
+                        helpers.addResult(results, 0, 'Bucket versioning Enabled', region, resource);
                     } else if ((bucket.versioning &&
                         !bucket.versioning.enabled) ||
                         !bucket.versioning){
-                        helpers.addResult(results, 2, 'Bucket versioning not Enabled', region, bucket.id);
+                        helpers.addResult(results, 2, 'Bucket versioning not Enabled', region, resource);
                     }
                 } else {
                     helpers.addResult(results, 0, 'No storage buckets found', region);
-                    return
+                    return;
                 }
             });
 
@@ -54,4 +56,4 @@ module.exports = {
             callback(null, results, source);
         });
     }
-}
+};
