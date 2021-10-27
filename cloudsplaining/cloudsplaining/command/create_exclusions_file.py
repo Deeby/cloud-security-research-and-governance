@@ -12,7 +12,7 @@ from pathlib import Path
 import logging
 import click
 from cloudsplaining.shared.constants import EXCLUSIONS_TEMPLATE
-from cloudsplaining import change_log_level
+from cloudsplaining import set_log_level
 from cloudsplaining.shared import utils
 
 logger = logging.getLogger(__name__)
@@ -30,21 +30,13 @@ logger = logging.getLogger(__name__)
     required=True,
     help="Relative path to output file where we want to store the exclusions template.",
 )
-@click.option(
-    "--verbose",
-    "-v",
-    type=click.Choice(
-        ["critical", "error", "warning", "info", "debug"], case_sensitive=False
-    ),
-)
-def create_exclusions_file(output_file, verbose):
+@click.option("--verbose", "-v", "verbosity", count=True)
+def create_exclusions_file(output_file: str, verbosity: int) -> None:
     """
     Creates a YML file to be used as a custom exclusions template,
     so users can fill out the fields without needing to look up the required format.
     """
-    if verbose:
-        log_level = getattr(logging, verbose.upper())
-        change_log_level(log_level)
+    set_log_level(verbosity)
 
     filename = Path(output_file).resolve()
     with open(filename, "a") as file_obj:
@@ -52,7 +44,8 @@ def create_exclusions_file(output_file, verbose):
             file_obj.write(line)
     utils.print_green(f"Success! Exclusions template file written to: {filename}")
     print(
-        "Make sure you download your account authorization details before running the scan. Set your AWS access keys as environment variables then run: "
+        "Make sure you download your account authorization details before running the scan."
+        "Set your AWS access keys as environment variables then run: "
     )
     print("\tcloudsplaining download")
     print("You can use this with the scan command as shown below: ")

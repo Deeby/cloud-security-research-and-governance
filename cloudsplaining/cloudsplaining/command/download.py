@@ -5,14 +5,15 @@ account-alias.json """
 # Licensed under the BSD 3-Clause license.
 # For full license text, see the LICENSE file in the repo root
 # or https://opensource.org/licenses/BSD-3-Clause
-import os
 import json
 import logging
 from pathlib import Path
+from typing import Dict, List, Any
+
 import boto3
 import click
 from botocore.config import Config
-from cloudsplaining import change_log_level
+from cloudsplaining import set_log_level
 
 logger = logging.getLogger(__name__)
 
@@ -43,51 +44,43 @@ logger = logging.getLogger(__name__)
     help="When downloading AWS managed policy documents, also include the non-default policy versions."
     " Note that this will dramatically increase the size of the downloaded file.",
 )
-@click.option(
-    "--verbose",
-    "-v",
-    type=click.Choice(
-        ["critical", "error", "warning", "info", "debug"], case_sensitive=False
-    ),
-)
-def download(profile, output, include_non_default_policy_versions, verbose):
+@click.option("--verbose", "-v", "verbosity", count=True)
+def download(
+    profile: str, output: str, include_non_default_policy_versions: bool, verbosity: int
+) -> int:
     """
     Runs aws iam get-authorization-details on all accounts specified in the aws credentials file, and stores them in
     account-alias.json
     """
-    if verbose:
-        log_level = getattr(logging, verbose.upper())
-        change_log_level(log_level)
+    set_log_level(verbosity)
+
     default_region = "us-east-1"
     session_data = {"region_name": default_region}
 
     if profile:
         session_data["profile_name"] = profile
-        output_filename = os.path.join(output, f"{profile}.json")
+        output_filename = Path(output) / f"{profile}.json"
     else:
-        output_filename = "default.json"
+        output_filename = Path("default.json")
 
     results = get_account_authorization_details(
         session_data, include_non_default_policy_versions
     )
 
-    if os.path.exists(output_filename):
-        os.remove(output_filename)
-    with open(output_filename, "w") as file:
-        json.dump(results, file, indent=4, default=str)
-        print(f"Saved results to {output_filename}")
+    output_filename.write_text(json.dumps(results, indent=4, default=str))
+    print(f"Saved results to {output_filename}")
     return 1
 
 
 def get_account_authorization_details(
-    session_data, include_non_default_policy_versions
-):
+    session_data: Dict[str, str], include_non_default_policy_versions: bool
+) -> Dict[str, List[Any]]:
     """Runs aws-iam-get-account-authorization-details"""
     session = boto3.Session(**session_data)
     config = Config(connect_timeout=5, retries={"max_attempts": 10})
     iam_client = session.client("iam", config=config)
 
-    results = {
+    results: Dict[str, List[Any]] = {
         "UserDetailList": [],
         "GroupDetailList": [],
         "RoleDetailList": [],
