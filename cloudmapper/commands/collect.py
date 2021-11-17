@@ -18,6 +18,7 @@ __description__ = "Run AWS API calls to collect data from the account"
 
 MAX_RETRIES = 3
 
+
 def snakecase(s):
     return s.replace("-", "_")
 
@@ -147,6 +148,12 @@ def call_function(outputfile, handler, method_to_call, parameters, check, summar
         ):
             print("  - No policy exists")
         elif (
+            "ResourceNotFoundException" in str(e)
+            and call_summary["service"] == "glacier"
+            and call_summary["action"] == "get_vault_access_policy"
+        ):
+            print("  - No policy exists")
+        elif (
             "AccessDeniedException" in str(e)
             and call_summary["service"] == "kms"
             and call_summary["action"] == "list_key_policies"
@@ -170,8 +177,14 @@ def call_function(outputfile, handler, method_to_call, parameters, check, summar
             and call_summary["action"] == "get_key_rotation_status"
         ):
             print("  - Denied, which should mean this KMS has restricted access")
+        elif (
+            "InvalidAccessException" in str(e)
+            and call_summary["service"] == "securityhub"
+            and call_summary["action"] == "describe_hub"
+        ):
+            print("  - Securityhub is not enabled")
         elif "AWSOrganizationsNotInUseException" in str(e):
-            print(' - Your account is not a member of an organization.')
+            print(" - Your account is not a member of an organization.")
         else:
             print("ClientError: {}".format(e), flush=True)
             call_summary["exception"] = e
@@ -211,12 +224,12 @@ def collect(arguments):
 
     # Identify the default region used by global services such as IAM
     default_region = os.environ.get("AWS_REGION", "us-east-1")
-    if 'gov-' in default_region:
-        default_region = 'us-gov-west-1'
-    elif 'cn-' in default_region:
-        default_region = 'cn-north-1'
+    if "gov-" in default_region:
+        default_region = "us-gov-west-1"
+    elif "cn-" in default_region:
+        default_region = "cn-north-1"
     else:
-        default_region = 'us-east-1'
+        default_region = "us-east-1"
 
     regions_filter = None
     if len(arguments.regions_filter) > 0:
@@ -278,7 +291,9 @@ def collect(arguments):
     region_list = ec2.describe_regions()
 
     if regions_filter is not None:
-        filtered_regions = [r for r in region_list["Regions"] if r["RegionName"] in regions_filter]
+        filtered_regions = [
+            r for r in region_list["Regions"] if r["RegionName"] in regions_filter
+        ]
         region_list["Regions"] = filtered_regions
 
     with open("account-data/{}/describe-regions.json".format(account_dir), "w+") as f:
@@ -295,6 +310,7 @@ def collect(arguments):
     # Services that will only be queried in the default_
     # TODO: Identify these from boto
     universal_services = [
+        "account",
         "sts",
         "iam",
         "route53",
@@ -331,8 +347,9 @@ def collect(arguments):
                 )
                 continue
             handler = session.client(
-                runner["Service"], region_name=region["RegionName"],
-                config=Config(retries={'max_attempts': arguments.max_attempts})
+                runner["Service"],
+                region_name=region["RegionName"],
+                config=Config(retries={"max_attempts": arguments.max_attempts}),
             )
 
             filepath = "account-data/{}/{}/{}-{}".format(
@@ -369,7 +386,9 @@ def collect(arguments):
                             # For each cluster, read the `ecs list-tasks`
                             for clusterArn in list_clusters["clusterArns"]:
                                 cluster_path = (
-                                    action_path + "/" + urllib.parse.quote_plus(clusterArn)
+                                    action_path
+                                    + "/"
+                                    + urllib.parse.quote_plus(clusterArn)
                                 )
                                 make_directory(cluster_path)
 
@@ -405,7 +424,10 @@ def collect(arguments):
                                             runner.get("Check", None),
                                             summary,
                                         )
-                elif runner["Service"] == "route53" and runner["Request"] == "list-hosted-zones-by-vpc":
+                elif (
+                    runner["Service"] == "route53"
+                    and runner["Request"] == "list-hosted-zones-by-vpc"
+                ):
                     action_path = filepath
                     make_directory(action_path)
 
@@ -419,7 +441,9 @@ def collect(arguments):
                         # For each region
                         for collect_region in describe_regions["Regions"]:
                             cluster_path = (
-                                action_path + "/" + urllib.parse.quote_plus(collect_region["RegionName"])
+                                action_path
+                                + "/"
+                                + urllib.parse.quote_plus(collect_region["RegionName"])
                             )
                             make_directory(cluster_path)
 
@@ -427,7 +451,7 @@ def collect(arguments):
                             describe_vpcs_file = "account-data/{}/{}/{}".format(
                                 account_dir,
                                 collect_region["RegionName"],
-                                "ec2-describe-vpcs.json"
+                                "ec2-describe-vpcs.json",
                             )
 
                             if os.path.isfile(describe_vpcs_file):
@@ -438,13 +462,17 @@ def collect(arguments):
                                         outputfile = (
                                             action_path
                                             + "/"
-                                            + urllib.parse.quote_plus(collect_region["RegionName"])
+                                            + urllib.parse.quote_plus(
+                                                collect_region["RegionName"]
+                                            )
                                             + "/"
                                             + urllib.parse.quote_plus(vpc["VpcId"])
                                         )
 
                                         call_parameters = {}
-                                        call_parameters["VPCRegion"] = collect_region["RegionName"]
+                                        call_parameters["VPCRegion"] = collect_region[
+                                            "RegionName"
+                                        ]
                                         call_parameters["VPCId"] = vpc["VpcId"]
                                         call_function(
                                             outputfile,
@@ -566,7 +594,7 @@ def run(arguments):
     )
     parser.add_argument(
         "--clean",
-        help="Remove any existing data for the account before gathering",
+        help="Remove any existing local, previously collected data for the account before gathering",
         action="store_true",
     )
     parser.add_argument(
@@ -575,7 +603,7 @@ def run(arguments):
         required=False,
         type=int,
         dest="max_attempts",
-        default=4
+        default=4,
     )
     parser.add_argument(
         "--regions",
@@ -583,7 +611,7 @@ def run(arguments):
         required=False,
         type=str,
         dest="regions_filter",
-        default=""
+        default="",
     )
 
     args = parser.parse_args(arguments)

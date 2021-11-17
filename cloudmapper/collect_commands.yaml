@@ -110,6 +110,8 @@
   Request: describe-volumes
 - Service: ec2
   Request: describe-addresses
+- Service: ec2
+  Request: describe-internet-gateways
 - Service: cloudtrail
   Request: describe-trails
 - Service: cloudtrail
@@ -415,3 +417,12 @@
   Request: get-jobs
 - Service: glue
   Request: get-triggers
+- Service: dynamodb
+  Request: list-tables
+- Service: dynamodb
+  Request: describe-table
+  Parameters:
+    - Name: TableName
+      Value: dynamodb-list-tables.json|.TableNames[]?|.
+- Service: securityhub
+  Request: describe-hub
